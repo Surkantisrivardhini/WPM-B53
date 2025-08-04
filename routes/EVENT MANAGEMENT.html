@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Event Management on Every Occasion</title>
+  <style>
+    /* Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #222;
+      background-color: #fafafa;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a {
+      color: #1E90FF;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    a:hover, a:focus {
+      color: #0b66d1;
+      outline: none;
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+      color: #1E90FF;
+    }
+    h2 {
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    /* Container & layout */
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 0 1rem 3rem;
+    }
+
+    /* Header & Nav */
+    header {
+      background-color: #1E90FF;
+      color: white;
+      padding: 1rem 0;
+      text-align: center;
+      box-shadow: 0 2px 6px rgb(30 144 255 / 0.4);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    nav {
+      margin-top: 0.5rem;
+    }
+    nav a {
+      margin: 0 1rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: inline-block;
+    }
+    nav a:focus {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #1E90FFCC, #1C86EEDD);
+      color: white;
+      text-align: center;
+      padding: 6rem 1rem 4rem;
+      border-radius: 0 0 50% 50% / 60% 60% 40% 40%;
+      box-shadow: inset 0 0 100px 40px rgba(0,0,0,0.15);
+    }
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.1;
+    }
+    .hero p {
+      font-size: 1.3rem;
+      max-width: 600px;
+      margin: 0 auto;
+      font-weight: 300;
+    }
+    .hero button {
+      margin-top: 2rem;
+      background-color: #fff;
+      color: #1E90FF;
+      border: none;
+      padding: 1rem 2.5rem;
+      font-size: 1.2rem;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 5px 15px rgb(0 0 0 / 0.1);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .hero button:hover, .hero button:focus {
+      background-color: #0b66d1;
+      color: #fff;
+      outline: none;
+    }
+
+    /* Sections */
+    section {
+      padding: 3rem 0;
+    }
+    section.bg-light {
+      background-color: #f5f8fc;
+    }
+    section h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    /* Event Showcase */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .event-card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgb(0 0 0 / 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+    .event-card:hover, .event-card:focus-within {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgb(0 0 0 / 0.14);
+      outline: none;
+    }
+    .event-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-bottom: 1px solid #ddd;
+    }
+    .event-content {
+      padding: 1.25rem 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .event-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #1E90FF;
+    }
+    .event-info {
+      font-size: 0.95rem;
+      margin-bottom: 0.85rem;
+      color: #444;
+      line-height: 1.3;
+    }
+    .event-description {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 1rem;
+      flex-grow: 1;
+    }
+    .event-highlight {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #0b66d1;
+    }
+
+    /* Testimonials */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .testimonial-card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.06);
+      padding: 2rem 1.5rem 2rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      font-style: italic;
+      color: #333;
+    }
+    .testimonial-card::before {
+      content: "“";
+      font-size: 3.5rem;
+      color: #1E90FF;
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      opacity: 0.12;
+      font-family: serif;
+      user-select: none;
+    }
+    .testimonial-text {
+      margin-bottom: 1.5rem;
+    }
+    .testimonial-author {
+      font-weight: 700;
+      font-style: normal;
+      color: #1E90FF;
+      font-size: 1rem;
+    }
+    /* Star rating */
+    .stars {
+      color: #FFB400;
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    /* Features */
+    .features-list {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2rem;
+      text-align: center;
+    }
+    .feature-item {
+      background: white;
+      padding: 2rem 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgb(0 0 0 / 0.07);
+      transition: box-shadow 0.3s ease;
+    }
+    .feature-item:hover, .feature-item:focus-within {
+      box-shadow: 0 8px 20px rgb(0 0 0 / 0.12);
+      outline: none;
+    }
+    .feature-icon {
+      font-size: 3rem;
+      color: #1E90FF;
+      margin-bottom: 1rem;
+    }
+    .feature-title {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+    .feature-desc {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    /* Contact / Customer Care */
+    .contact-info {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+      text-align: center;
+      font-size: 1rem;
+      color: #333;
+    }
+    .contact-info h3 {
+      color: #1E90FF;
+      margin-bottom: 1rem;
+    }
+    .contact-info p {
+      margin: 0.4rem 0;
+    }
+    .contact-info a {
+      color: #1E90FF;
+      font-weight: 600;
+    }
+    .contact-info a:hover,
+    .contact-info a:focus {
+      color: #0b66d1;
+      outline: none;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #222;
+      color: #eee;
+      text-align: center;
+      padding: 1rem 0;
+      font-size: 0.9rem;
+      margin-top: 3rem;
+    }
+    footer a {
+      color: #1E90FF;
+    }
+    footer a:focus {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+
+    /* Accessibility - focus visible */
+    :focus-visible {
+      outline: 3px solid #1E90FF;
+      outline-offset: 2px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.3rem;
+      }
+      .hero p {
+        font-size: 1.1rem;
+      }
+    }
+    @media (max-width: 400px) {
+      nav a {
+        display: block;
+        margin: 0.5rem 0;
+      }
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: white;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .modal h2 {
+      margin-top: 0;
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1.25rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #1E90FF;
+    }
+    form label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="date"],
+    form input[type="file"],
+    form select,
+    form textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    form input[type="text"]:focus,
+    form input[type="email"]:focus,
+    form input[type="date"]:focus,
+    form input[type="file"]:focus,
+    form select:focus,
+    form textarea:focus {
+      border-color: #1E90FF;
+      outline: none;
+    }
+    form textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    form button {
+      margin-top: 1.5rem;
+      background: #1E90FF;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 1.1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+    form button:hover, form button:focus {
+      background: #0b66d1;
+      outline: none;
+    }
+
+  </style>
+</head>
+<body>
+  <header role="banner">
+    <h1 tabindex="0">Event Management on Every Occasion</h1>
+    <nav role="navigation" aria-label="Primary navigation">
+      <a href="#events" tabindex="0">Events</a>
+      <a href="#features" tabindex="0">Features</a>
+      <a href="#testimonials" tabindex="0">Testimonials</a>
+      <a href="#contact" tabindex="0">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" role="region" aria-label="Welcome message">
+      <h1>Welcome to Event Management</h1>
+      <p>Your dream event organized professionally from start to finish. Experience seamless planning, custom designs, and flawless execution.</p>
+      <button id="openFormBtn" aria-haspopup="dialog" aria-controls="eventSubmissionModal" aria-expanded="false">Submit Your Event</button>
+    </section>
+
+    <section id="events" class="container" role="region" aria-labelledby="events-title">
+      <h2 id="events-title">Our Organized Events</h2>
+      <div class="events-grid">
+        <article class="event-card" tabindex="0" aria-label="Birthday Celebration Event">
+          <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80" alt="Birthday party decorations" />
+          <div class="event-content">
+            <h3 class="event-name">Joyful Birthday Celebrations</h3>
+            <p class="event-info"><strong>Date:</strong> July 10, 2025 | <strong>Type:</strong> Birthday</p>
+            <p class="event-description">Colorful themed parties with cake, balloons, and fun activities for all ages.</p>
+            <p class="event-highlight">Custom themes & personalized gifts including photo frames</p>
+          </div>
+        </article>
+
+        <article class="event-card" tabindex="0" aria-label="Marriage Ceremony and Sub-events">
+          <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80" alt="Marriage mandap decorated with flowers" />
+          <div class="event-content">
+            <h3 class="event-name">Marriages - Sangeeth, Mehndi & More</h3>
+            <p class="event-info"><strong>Date:</strong> August 20-23, 2025 | <strong>Type:</strong> Marriage</p>
+            <p class="event-description">Complete wedding ceremonies including vibrant sangeeth nights, colorful mehndi events, and traditional rituals.</p>
+            <p class="event-highlight">All sub-events coordinated & customized decor with gift hampers like clocks and bottles</p>
+          </div>
+        </article>
+
+        <article class="event-card" tabindex="0" aria-label="Baby Shower Celebration">
+          <img src="https://images.unsplash.com/photo-1508214751195-8fd0eb25d2d0?auto=format&fit=crop&w=600&q=80" alt="Baby shower decorations" />
+          <div class="event-content">
+            <h3 class="event-name">Delightful Baby Showers</h3>
+            <p class="event-info"><strong>Date:</strong> September 5, 2025 | <strong>Type:</strong> Baby Shower</p>
+            <p class="event-description">Joyful gatherings with soft pastel decor, games, and memorable photo sessions.</p>
+            <p class="event-highlight">Personalized themes & gift arrangements including custom cups</p>
+          </div>
+        </article>
+
+        <article class="event-card" tabindex="0" aria-label="Vratham Ceremony">
+          <img src="https://images.unsplash.com/photo-1506878202080-9f547f864c98?auto=format&fit=crop&w=600&q=80" alt="Vratham traditional setup" />
+          <div class="event-content">
+            <h3 class="event-name">Traditional Vratham Ceremonies</h3>
+            <p class="event-info"><strong>Date:</strong> Various dates | <strong>Type:</strong> Religious</p>
+            <p class="event-description">Organized pujas and vrathams with authentic rituals, priest arrangements, and decoration.</p>
+            <p class="event-highlight">Experienced priests & sacred ambiance with special gift offerings</p>
+          </div>
+        </article>
+
+        <!-- Add more events if you want -->
+      </div>
+    </section>
+
+    <section id="features" class="bg-light" role="region" aria-labelledby="features-title">
+      <h2 id="features-title">Why Choose Us?</h2>
+      <div class="features-list">
+        <div class="feature-item" tabindex="0">
+          <div class="feature-icon" aria-hidden="true">🎨</div>
+          <h3 class="feature-title">Custom Design Suggestions</h3>
+          <p class="feature-desc">We provide personalized themes and decor options tailored to your event’s vision.</p>
+        </div>
+        <div class="feature-item" tabindex="0">
+          <div class="feature-icon" aria-hidden="true">🗓️</div>
+          <h3 class="feature-title">Seamless Planning</h3>
+          <p class="feature-desc">Professional scheduling and vendor management to make your event flawless.</p>
+        </div>
+        <div class="feature-item" tabindex="0">
+          <div class="feature-icon" aria-hidden="true">💬</div>
+          <h3 class="feature-title">Dedicated Support</h3>
+          <p class="feature-desc">Expert consultants available to guide you throughout the organization process.</p>
+        </div>
+        <div class="feature-item" tabindex="0">
+          <div class="feature-icon" aria-hidden="true">🎁</div>
+          <h3 class="feature-title">Gift Hampers for Every Occasion</h3>
+          <p class="feature-desc">Receive thoughtful gifts like frames, clocks, bottles, and cups as a token of appreciation after your event.</p>
+        </div>
+        <div class="feature-item" tabindex="0">
+          <div class="feature-icon" aria-hidden="true">🔒</div>
+          <h3 class="feature-title">Top Security Standards</h3>
+          <p class="feature-desc">Your data is protected using industry-leading security practices.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="testimonials" class="container" role="region" aria-labelledby="testimonials-title">
+      <h2 id="testimonials-title">What Our Customers Say</h2>
+      <div class="testimonials-grid">
+        <blockquote class="testimonial-card" tabindex="0">
+          <div class="stars" aria-label="5 star rating">★★★★★</div>
+          <p class="testimonial-text">"They transformed our wedding into a dream come true. Every detail was perfect!"</p>
+          <cite class="testimonial-author">– Sarah M.</cite>
+        </blockquote>
+
+        <blockquote class="testimonial-card" tabindex="0">
+          <div class="stars" aria-label="5 star rating">★★★★★</div>
+          <p class="testimonial-text">"Professional, creative, and dependable. Our corporate event was a huge success."</p>
+          <cite class="testimonial-author">– James L.</cite>
+        </blockquote>
+
+        <blockquote class="testimonial-card" tabindex="0">
+          <div class="stars" aria-label="5 star rating">★★★★★</div>
+          <p class="testimonial-text">"Their community festival planning brought everyone together in the best way!"</p>
+          <cite class="testimonial-author">– Mia K.</cite>
+        </blockquote>
+      </div>
+    </section>
+
+    <section id="contact" class="bg-light container" role="region" aria-labelledby="contact-title">
+      <h2 id="contact-title">Customer Care & Contact Details</h2>
+      <div class="contact-info" tabindex="0">
+        <h3>Contact Us</h3>
+        <p><strong>Phone:</strong> +91 98765 43210</p>
+        <p><strong>Email:</strong> <a href="mailto:support@eventmanagement.com">support@eventmanagement.com</a></p>
+        <p><strong>Address:</strong> 123 Event Street, Celebration City, Country</p>
+        <p>For any other requirements or queries, feel free to reach out to our dedicated customer care team.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <p>&copy; 2025 Event Management on Every Occasion | <a href="#" tabindex="0">Privacy Policy</a> | <a href="#" tabindex="0">Contact Us</a></p>
+  </footer>
+
+  <!-- Modal for Event Submission -->
+  <div class="modal-overlay" id="eventSubmissionModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+    <div class="modal" role="document">
+      <button class="modal-close" id="modalCloseBtn" aria-label="Close event submission form">&times;</button>
+      <h2 id="modalTitle">Submit Your Event</h2>
+      <form id="eventForm" novalidate>
+        <label for="organizerName">Your Full Name *</label>
+        <input type="text" id="organizerName" name="organizerName" required />
+
+        <label for="organizerEmail">Your Email Address *</label>
+        <input type="email" id="organizerEmail" name="organizerEmail" required />
+
+        <label for="eventType">Event Type *</label>
+        <select id="eventType" name="eventType" required aria-describedby="eventTypeHelp">
+          <option value="" disabled selected>Select the event type</option>
+          <option value="birthday">Birthday</option>
+          <option value="marriage">Marriage</option>
+          <option value="babyshower">Baby Shower</option>
+          <option value="vratham">Vratham</option>
+          <option value="other">Other</option>
+        </select>
+        <small id="eventTypeHelp" style="color:#555; font-size:0.9rem;">Additional fields will appear based on your selection.</small>
+
+        <!-- Birthday specific fields -->
+        <div id="birthdayFields" style="display:none;">
+          <label for="birthdayPersonName">Name of Birthday Person *</label>
+          <input type="text" id="birthdayPersonName" name="birthdayPersonName" />
+          <label for="birthdayPersonPhoto">Photo of Birthday Person (upload)</label>
+          <input type="file" id="birthdayPersonPhoto" name="birthdayPersonPhoto" accept="image/*" />
+        </div>
+
+        <!-- Marriage specific fields -->
+        <div id="marriageFields" style="display:none;">
+          <label for="marriageDate">Marriage Date *</label>
+          <input type="date" id="marriageDate" name="marriageDate" />
+          <label for="marriageVenue">Venue *</label>
+          <input type="text" id="marriageVenue" name="marriageVenue" />
+          <label for="brideName">Bride's Name *</label>
+          <input type="text" id="brideName" name="brideName" />
+          <label for="groomName">Groom's Name *</label>
+          <input type="text" id="groomName" name="groomName" />
+          <label for="marriagePhotos">Upload Photos (multiple allowed)</label>
+          <input type="file" id="marriagePhotos" name="marriagePhotos" accept="image/*" multiple />
+          <label for="decorationSpecs">Decoration Specifications / Preferences</label>
+          <textarea id="decorationSpecs" name="decorationSpecs"></textarea>
+        </div>
+
+        <!-- Common fields -->
+        <label for="specialRequests">Additional Details / Special Requests</label>
+        <textarea id="specialRequests" name="specialRequests"></textarea>
+
+        <button type="submit">Submit Event</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Modal open/close handlers
+    const modal = document.getElementById('eventSubmissionModal');
+    const openBtn = document.getElementById('openFormBtn');
+    const closeBtn = document.getElementById('modalCloseBtn');
+    const eventTypeSelect = document.getElementById('eventType');
+    const birthdayFields = document.getElementById('birthdayFields');
+    const marriageFields = document.getElementById('marriageFields');
+    const form = document.getElementById('eventForm');
+
+    openBtn.addEventListener('click', () => {
+      modal.classList.add('active');
+      openBtn.setAttribute('aria-expanded', 'true');
+      // Focus first input for accessibility
+      document.getElementById('organizerName').focus();
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if(e.target === modal) closeModal();
+    });
+
+    function closeModal() {
+      modal.classList.remove('active');
+      openBtn.setAttribute('aria-expanded', 'false');
+      openBtn.focus();
+      form.reset();
+      birthdayFields.style.display = 'none';
+      marriageFields.style.display = 'none';
+    }
+
+    // Show/hide conditional fields based on event type
+    eventTypeSelect.addEventListener('change', () => {
+      const val = eventTypeSelect.value;
+      birthdayFields.style.display = val === 'birthday' ? 'block' : 'none';
+      marriageFields.style.display = val === 'marriage' ? 'block' : 'none';
+
+      // Set required attributes dynamically
+      setRequiredFields(val);
+    });
+
+    function setRequiredFields(eventType) {
+      // Birthday fields
+      document.getElementById('birthdayPersonName').required = (eventType === 'birthday');
+      // Photo input is optional
+
+      // Marriage fields
+      const marriageFieldIds = ['marriageDate', 'marriageVenue', 'brideName', 'groomName'];
+      marriageFieldIds.forEach(id => {
+        document.getElementById(id).required = (eventType === 'marriage');
+      });
+    }
+
+    // Form submission handler (demo only)
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      if(!form.checkValidity()) {
+        alert('Please fill in all required fields correctly.');
+        return;
+      }
+
+      // Gather form data (for demo, we just alert)
+      const formData = new FormData(form);
+      let summary = `Thank you, ${formData.get('organizerName')}! Your event submission details:\n\n`;
+      summary += `Event Type: ${formData.get('eventType')}\n`;
+
+      if(formData.get('eventType') === 'birthday'){
+        summary += `Birthday Person: ${formData.get('birthdayPersonName') || 'N/A'}\n`;
+      } else if(formData.get('eventType') === 'marriage'){
+        summary += `Marriage Date: ${formData.get('marriageDate') || 'N/A'}\n`;
+        summary += `Venue: ${formData.get('marriageVenue') || 'N/A'}\n`;
+        summary += `Bride: ${formData.get('brideName') || 'N/A'}\n`;
+        summary += `Groom: ${formData.get('groomName') || 'N/A'}\n`;
+        summary += `Decoration Specs: ${formData.get('decorationSpecs') || 'N/A'}\n`;
+      }
+
+      summary += `Additional Requests: ${formData.get('specialRequests') || 'None'}\n\n`;
+      summary += `We will contact you soon with design suggestions and details including personalized gift hampers.`;
+
+      alert(summary);
+      closeModal();
+    });
+
+    // Accessibility: focus trap inside modal (basic)
+    modal.addEventListener('keydown', e => {
+      if(e.key === 'Tab'){
+        const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        const firstEl = focusableElements[0];
+        const lastEl = focusableElements[focusableElements.length -1];
+        if(e.shiftKey){
+          if(document.activeElement === firstEl) {
+            e.preventDefault();
+            lastEl.focus();
+          }
+        } else {
+          if(document.activeElement === lastEl){
+            e.preventDefault();
+            firstEl.focus();
+          }
+        }
+      }
+      if(e.key === 'Escape'){
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
